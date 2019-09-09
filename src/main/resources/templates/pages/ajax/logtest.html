@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<h1>查询日志</h1>
+	<form action="#">
+		<input type="text" id="name">
+		<button type="button" id="searchName">查询</button>
+	</form>
+	<br />
+	<div>
+		<table border="1" cellspacing="0" cellpadding="10" width="100%">
+			<thead>
+				<tr>
+					<th>username</th>
+					<th>createdTime</th>
+				</tr>
+			</thead>
+			<tbody id="tbodyId">
+				<tr>
+					<td colspan="2">查询中...</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	<script type="text/javascript" src="/myjs/myajax.js"></script>
+	<script type="text/javascript">
+		window.onload = function() {
+			var btn = document.getElementById("searchName");
+			btn.onclick = dosearchObject;
+		}
+
+		function dosearchObject() {
+			console.log("dosearchObject()");
+			let url = "doFindPageObjects";
+			let params = "pageCurrent=1";
+			$.getMyJson(url, params, function(result) {
+				console.log(result);
+				handleResult(result);
+			});
+		}
+		function handleResult(result) {
+			if (result.state == 1) {
+				doSetTbody(result.data.records);
+			} else {
+				alert(result.message);
+			}
+		}
+		function doSetTbody(records) {
+			var tBody = document.getElementById("tbodyId");
+			tBody.innerHTML = "";
+			for ( let i in records) {
+				let tr = document.createElement("tr");
+				let idTd = document.createElement("td");
+				idTd.innerText = records[i].username;
+				let timeTd = document.createElement("td");
+				timeTd.innerText = records[i].createdTime;
+				tr.appendChild(idTd);
+				tr.appendChild(timeTd);
+				tBody.appendChild(tr);
+			}
+		}
+	</script>
+</body>
+</html>

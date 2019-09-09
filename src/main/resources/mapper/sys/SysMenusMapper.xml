@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.company.db.sys.dao.SysMenuDao">
+
+	<sql id="rols">
+		id,
+		name,
+		url,
+		type,
+		sort,
+		note,
+		parentId,
+		permission,
+		createdTime,
+		modifiedTime,
+		createdUser,
+		modifiedUser
+	</sql>
+
+	<select id="findObjects" resultType="map">
+		select c.*,(select name from
+		sys_menus p where
+		c.parentId=p.id)parentName from sys_menus c
+	</select>
+
+	<select id="getChildCount" resultType="int" parameterType="int">
+		select count(*) from sys_menus where parentId = #{id}
+	</select>
+
+	<delete id="deleteObject" parameterType="int">
+		delete from sys_menus
+		where id = #{id}
+	</delete>
+
+	<update id="updateObject"
+		parameterType="com.company.db.entity.SysMenu">
+		update sys_menus
+		set
+		name=#{name},
+		url=#{url},
+		type=#{type},
+		sort=#{sort},
+		note=#{note},
+		parentId=#{parentId},
+		permission=#{permission},
+		modifiedTime=now(),
+		modifiedUser=#{modifiedUser}
+		where id = #{id}
+	</update>
+
+	<insert id="insertObject"
+		parameterType="com.company.db.entity.SysMenu">
+		insert into sys_menus
+		(name,url,type,sort,note,parentId,permission,
+		createdTime,modifiedTime,createdUser,modifiedUser)
+		values
+		(#{name},#{url},#{type},#{sort},#{note},#{parentId},#{permission},
+		now(),now(),#{createdUser},#{modifiedUser})
+	</insert>
+
+	<select id="findZtreeMenuNodes"
+		resultType="com.company.db.common.vo.Node">
+		select id,name,parentId from sys_menus
+	</select>
+
+	<select id="findPermissions" resultType="string">
+		select permission <!-- sys:user:update -->
+		from sys_menus
+		where id in
+		<foreach collection="menuIds" open="(" close=")" separator=","
+			item="item">
+			#{item}
+		</foreach>
+	</select>
+
+
+</mapper>

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.company.db.sys.dao.SysLogsDao">
+
+	<sql id="rows">
+		id,username,operation,method,params,time,ip,createdTime
+	</sql>
+
+	<sql id="queryWhereId">
+		<where>
+			<if test="username!=null and username!=''">
+				username like concat("%",#{username},"%")
+			</if>
+		</where>
+	</sql>
+	<!-- 按id删除记录 -->
+	<delete id="deleteObjects">
+		delete from sys_logs where id in <!-- (1,2,3,4,5) -->
+		<foreach collection="ids" open="(" close=")" separator=","
+			item="id">
+			#{id}
+		</foreach>
+	</delete>
+
+	<!-- 统计记录总数 -->
+	<select id="getRowCount" resultType="int">
+		select count(*) from sys_logs
+		<include refid="queryWhereId" />
+	</select>
+
+	<select id="findPageObjects"
+		resultType="com.company.db.entity.SysLog">
+		select
+		<include refid="rows" />
+		from sys_logs
+		<include refid="queryWhereId" />
+		order by createdTime desc
+		limit #{startIndex},#{pageSize}
+	</select>
+
+	<insert id="insertObject"
+		parameterType="com.company.db.entity.SysLog">
+		insert into sys_logs
+		(username,operation,method,params,time,ip,createdTime)
+		values
+		(#{username},#{operation},#{method},#{params},#{time},#{ip},#{createdTime})
+	</insert>
+</mapper>
